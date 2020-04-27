@@ -1,0 +1,53 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  pdf-service
+  Sample SAM Template for pdf-service
+
+Parameters:
+  CodeUri:
+    Type: String
+    Description: Corde URI of S3 Event Function
+  Handler:
+    Type: String
+    Description: Handler Function for the S3 Event Function
+  Runtime:
+    Type: String
+    Description: Runtime for the S3 Event Function
+    Default: nodejs12.x
+  S3EventBucket:
+    Type: AWS::S3::Bucket  
+    Description: The bucket that triggers the S3 Event
+  S3EventTrigger:
+    Type: String
+    Description: The events that thrigger the S3 Event Function
+    Default: s3:ObjectCreated:*
+  MemorySize:
+    Type: String
+    Description: Amount of memory for the S3 Event Function
+    Default: 512
+
+
+Resources:
+  S3EventFunction:
+    Type: AWS::Serverless::Function
+    CodeUri:
+      Ref: CodeUri
+    Handler:
+      Ref: Handler
+    Runtime:
+      Ref: Runtime
+    MemorySize:
+      Ref: MemorySize
+    Policies:
+    - S3CrudPolicy:
+            BucketName: 
+              Ref: InspectionBucket
+    Events:
+      S3Event:
+        Type: S3
+        Properties:
+          Bucket:
+            Ref: BucketEventSource
+          Events:
+            Ref: S3EventTrigger
